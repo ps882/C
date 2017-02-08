@@ -1,0 +1,187 @@
+ps882@ath-1:~$ cat linkedlist.c
+#include<stdio.h>
+#include<stdlib.h>
+#include<stdbool.h>
+
+struct linkedlist{
+    int data;
+    struct linkedlist* next;
+    };
+
+void preadd(int value , struct linkedlist** list ){
+    struct linkedlist* new = (struct linkedlist*) malloc(sizeof(struct linkedlist));
+    if (new == NULL){
+        printf("Cannot allocate memory\n");
+        exit(0);
+    }
+    new->data = value;
+    new->next = *list;
+    *list = new;
+    return;
+    }
+
+
+void postadd(int value , struct linkedlist** list){
+    struct linkedlist* new = (struct linkedlist*) malloc(sizeof(struct linkedlist));
+    if (new == NULL){
+        printf("Cannot allocate memory\n");
+        exit(0);
+    }
+
+    new->data = value;
+    new->next = NULL;
+
+    if (*list == NULL){
+        *list = new;
+        return;
+    }
+
+    struct linkedlist* pointer = *list;
+    while (pointer->next != NULL){
+        pointer = pointer->next;
+    }
+    pointer->next = new;
+}
+
+void printl(struct linkedlist* list){
+    struct linkedlist* pointer = list;
+    while (pointer != NULL){
+        printf("%d, ", pointer->data);
+        pointer = pointer->next;
+    }
+}
+
+bool removel(int value, struct linkedlist** list){
+    struct linkedlist* pointer = *list;
+    struct linkedlist* p_pointer = *list;
+
+    if (pointer == NULL){
+        return false;
+    }
+    while (pointer->data != value && pointer->next != NULL){
+        p_pointer = pointer;
+        pointer = pointer->next;
+    }
+    if (pointer == p_pointer){
+        *list = pointer->next;
+        free(pointer);
+        return true;
+    }
+    else if (pointer->data == value){
+        p_pointer->next = pointer->next;
+        free(pointer);
+        return true;
+    }
+    else{
+        return false;
+    }
+
+}
+
+bool swapl(struct linkedlist* pointera , struct linkedlist* pointerb){
+    int temp = pointera->data;
+    pointera->data = pointerb->data;
+    pointerb->data = temp;
+    }
+
+bool ssort(struct linkedlist* list){
+    struct linkedlist* ipointer = list;
+    struct linkedlist* jpointer;
+    struct linkedlist* min;
+    for( ; ipointer != NULL ; ipointer = ipointer->next ){
+        for( min = ipointer , jpointer = ipointer->next ; jpointer != NULL ; jpointer = jpointer->next){
+            if ( min->data > jpointer->data){
+                min = jpointer;
+            }
+        }
+        swapl(ipointer,min);
+    }
+}
+
+int getlen(struct linkedlist* list){
+    struct linkedlist* pointer = list;
+    int size = 0;
+    while(pointer != NULL){
+        pointer = pointer->next;
+        size += 1;
+    }
+    return size;
+}
+//void msort(struct linkedlist* list){
+
+
+//}
+
+struct linkedlist* smsort(struct linkedlist* list1 , struct linkedlist* list2){
+    int maxlen = getlen(list1) + getlen(list2);
+    //printf("length is %d , %d , %d\n", maxlen , getlen(list1),getlen(list2));
+    struct linkedlist* sortedlist;
+    struct linkedlist* temp = NULL;
+    int n;
+    for(n = 0;n< maxlen;n++){
+        sortedlist = (struct linkedlist*) malloc(sizeof(struct linkedlist));
+        sortedlist->next = temp;
+        temp = sortedlist;
+    }
+    struct linkedlist* head = sortedlist;
+    struct linkedlist* jpointer = list2;
+    struct linkedlist* ipointer = list1;
+    while (true){
+        if (jpointer == NULL){
+            break;
+        }
+        if (ipointer == NULL){
+            break;
+        }
+        if (ipointer->data < jpointer->data){
+            sortedlist->data = ipointer->data;
+            sortedlist = sortedlist->next;
+            ipointer = ipointer->next;
+        }
+        else {
+            sortedlist->data = jpointer->data;
+            sortedlist = sortedlist->next;
+            jpointer = jpointer->next;
+        }
+    }
+    while (jpointer != NULL){
+        sortedlist->data = jpointer->data;
+        sortedlist = sortedlist->next;
+        jpointer = jpointer->next;
+    }
+    while (ipointer != NULL){
+        sortedlist->data = ipointer->data;
+        sortedlist = sortedlist->next;
+        ipointer = ipointer->next;
+    }
+    return head;
+
+}
+void main(){
+    struct linkedlist* mylist = NULL;
+    preadd(3 , &mylist);
+    preadd(32 , &mylist);
+    preadd(7 , &mylist);
+    preadd(15 , &mylist);
+    preadd(9 , &mylist);
+    postadd(19 , &mylist);
+//    removel(32, &mylist);
+    printf("first list\n");
+    printl(mylist);
+    struct linkedlist* mylist2 = NULL;
+    preadd(5 , &mylist2);
+    preadd(2 , &mylist2);
+    preadd(37 , &mylist2);
+    preadd(11 , &mylist2);
+    preadd(24 , &mylist2);
+    postadd(112 , &mylist2);
+    printf("second list\n");
+    printl(mylist2);
+    printf("sorting\n");
+    ssort(mylist);
+    ssort(mylist2);
+//    printl(mylist);
+    struct linkedlist* t = smsort(mylist , mylist2);
+    printl(t);
+}
+ps882@ath-1:~
